@@ -1,4 +1,5 @@
 import Button from '../components/Button'
+import pfp from "../assets/pfp.jpg";
 
 const HomePage = () => {
   const stats = [
@@ -55,10 +56,10 @@ const HomePage = () => {
           </p>
           
           <div className='flex flex-wrap gap-4 pt-6'>
-            <Button variant='primary' size='lg' className='gap-2'>
+            <Button variant='glass-black' size='lg' className='gap-2'>
               View Projects
             </Button>
-            <Button variant='outline' size='lg' className='border-blue-600 text-blue-600'>
+            <Button variant='glass-purple' size='lg'>
                Contact Me
             </Button>
           </div>
@@ -81,11 +82,7 @@ const HomePage = () => {
         <div className='flex justify-center lg:justify-end order-1 lg:order-2'>
           <div className='relative w-full max-w-sm'>
             <div className='absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-xl opacity-30'></div>
-            <img 
-              src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=600&fit=crop'
-              alt='Developer working on laptop'
-              className='relative w-full h-auto rounded-2xl shadow-2xl object-cover aspect-square'
-            />
+            <img src={pfp} alt="Profile" />
           </div>
         </div>
       </section>
@@ -163,7 +160,7 @@ const HomePage = () => {
                 </div>
 
                 <div className='pt-2'>
-                  <Button variant='ghost' size='md' className='text-blue-600 hover:text-blue-700 self-start'>
+                  <Button variant='glass-green' size='md' className='self-start'>
                     View Project →
                   </Button>
                 </div>
@@ -174,7 +171,7 @@ const HomePage = () => {
 
         {/* View All Projects */}
         <div className='flex justify-center pt-8'>
-          <Button variant='outline' size='lg' className='border-blue-600 text-blue-600'>
+          <Button variant='glass-pink' size='lg'>
             View All Projects
           </Button>
         </div>
@@ -219,10 +216,10 @@ const HomePage = () => {
             I'm always interested in hearing about new projects and opportunities. Feel free to reach out!
           </p>
           <div className='flex flex-wrap justify-center gap-4 pt-4'>
-            <Button variant='primary' size='lg' className='bg-white text-blue-600 hover:bg-gray-100 hover:text-blue-700'>
+            <Button variant='glass-white' size='lg'>
               Start a Project
             </Button>
-            <Button variant='outline' size='lg' className='border-white text-white hover:bg-white/10'>
+            <Button variant='glass-white' size='lg'>
               Get in Touch
             </Button>
           </div>

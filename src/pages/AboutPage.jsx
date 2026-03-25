@@ -1,5 +1,6 @@
 import Button from '../components/Button'
 import { Link } from 'react-router-dom'
+import pfp from "../assets/pfp.jpg";
 
 const AboutPage = () => {
   const skills = [
@@ -47,11 +48,7 @@ const AboutPage = () => {
         <div className='flex justify-center order-2 lg:order-1'>
           <div className='relative w-full max-w-sm'>
             <div className='absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-xl opacity-30'></div>
-            <img 
-              src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=600&fit=crop'
-              alt='Jean Paula'
-              className='relative w-full h-auto rounded-2xl shadow-2xl object-cover aspect-square'
-            />
+            <img src={pfp} alt="Profile" />
           </div>
         </div>
 
@@ -95,10 +92,10 @@ const AboutPage = () => {
           </div>
 
           <div className='flex gap-4 pt-4'>
-            <Button variant='primary' size='md'>
+            <Button variant='glass-blue' size='md'>
               📥 Download CV
             </Button>
-            <Button variant='outline' size='md' className='border-blue-600 text-blue-600'>
+            <Button variant='glass-purple' size='md'>
               💬 Get in Touch
             </Button>
           </div>
@@ -205,11 +202,11 @@ const AboutPage = () => {
           </p>
           <div className='flex flex-wrap justify-center gap-4 pt-4'>
             <Link to='/'>
-              <Button variant='primary' size='lg' className='bg-white text-blue-600 hover:bg-gray-100'>
+              <Button variant='glass-white' size='lg'>
                 View My Work
               </Button>
             </Link>
-            <Button variant='outline' size='lg' className='border-white text-white hover:bg-white/10'>
+            <Button variant='glass-white' size='lg'>
               Contact Me
             </Button>
           </div>

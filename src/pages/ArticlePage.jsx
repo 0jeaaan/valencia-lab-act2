@@ -127,7 +127,7 @@ const ArticlePage = () => {
               <span>📅 {articles[0].date}</span>
               <span>⏱️ {articles[0].readTime}</span>
             </div>
-            <Button variant='primary' size='lg' className='mt-4'>
+            <Button variant='glass-blue' size='lg' className='mt-4'>
               Read Full Article →
             </Button>
           </div>
@@ -173,7 +173,7 @@ const ArticlePage = () => {
 
                 <div className='flex items-center justify-between pt-2 border-t border-gray-100'>
                   <span className='text-xs text-gray-500'>{article.date}</span>
-                  <Button variant='ghost' size='sm' className='text-blue-600 hover:text-blue-700'>
+                  <Button variant='glass-green' size='sm'>
                     Read →
                   </Button>
                 </div>
@@ -215,7 +215,7 @@ const ArticlePage = () => {
                 placeholder='your@email.com'
                 className='flex-1 px-6 py-3 rounded-lg bg-white border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 font-medium'
               />
-              <Button variant='primary' size='lg' className='bg-white text-blue-600 hover:bg-gray-100 hover:text-blue-700'>
+              <Button variant='glass-white' size='lg'>
                 Subscribe
               </Button>
             </div>
@@ -236,10 +236,10 @@ const ArticlePage = () => {
             Have an interesting idea or want to discuss web development? Let's connect!
           </p>
           <div className='flex flex-wrap justify-center gap-4 pt-4'>
-            <Button variant='primary' size='lg'>
+            <Button variant='glass-black' size='lg'>
               💬 Get in Touch
             </Button>
-            <Button variant='outline' size='lg' className='border-blue-600 text-blue-600'>
+            <Button variant='glass-pink' size='lg'>
               View My Projects
             </Button>
           </div>
