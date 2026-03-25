@@ -47,7 +47,7 @@ const HomePage = () => {
           </h1>
           
           <p className='text-lg lg:text-xl text-gray-700 leading-relaxed max-w-2xl font-medium'>
-            Full-stack web developer & IT student passionate about building modern, responsive web applications with clean code and beautiful UI/UX.
+            Full-stack web developer & IT student passionate about building modern, responsive web applications with clean code and beautiful UI/UX design.
           </p>
 
           <p className='text-base text-gray-600 leading-relaxed max-w-2xl'>
