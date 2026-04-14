@@ -19,24 +19,24 @@ const router = createBrowserRouter([
       { path: "about", element: <AboutPage /> },
       { path: "articles", element: <ArticleListPage /> },
       { path: "articles/:id", element: <ArticlePage /> },
+      { 
+        path: "signin", 
+        element: (
+          <AuthLayout>
+            <SignInPage />
+          </AuthLayout>
+        ) 
+      },
+      { 
+        path: "signup", 
+        element: (
+          <AuthLayout>
+            <SignUpPage />
+          </AuthLayout>
+        ) 
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
-  },
-  {
-    path: "/signin",
-    element: (
-      <AuthLayout>
-        <SignInPage />
-      </AuthLayout>
-    ),
-  },
-  {
-    path: "/signup",
-    element: (
-      <AuthLayout>
-        <SignUpPage />
-      </AuthLayout>
-    ),
   },
 ]);
 
