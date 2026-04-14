@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import Button from './Button'
 
 const NavBar = () => {
   const getLinkClass = ({ isActive }) => {
@@ -34,6 +35,25 @@ const NavBar = () => {
           <NavLink to='/articles' className={getLinkClass}>
             Articles
           </NavLink>
+
+          {/* Auth Buttons */}
+          <div className='flex items-center gap-2 ml-4 pl-4 border-l border-gray-200'>
+            <Button
+              to='/signin'
+              variant='ghost'
+              size='sm'
+              className='hidden sm:inline-flex'
+            >
+              Sign In
+            </Button>
+            <Button
+              to='/signup'
+              variant='primary'
+              size='sm'
+            >
+              Sign Up
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
