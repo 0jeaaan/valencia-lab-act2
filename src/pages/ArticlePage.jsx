@@ -1,68 +1,30 @@
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import Button from '../components/Button'
+import { articles } from '../assets/article-content'
 
 const ArticlePage = () => {
-  const articles = [
-    {
-      id: 1,
-      title: 'Building a React App from Scratch',
-      excerpt: 'A comprehensive guide to setting up a modern React application with Vite, Tailwind CSS, and best practices.',
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
-      date: 'March 20, 2024',
-      category: 'React',
-      readTime: '8 min read',
-      color: 'blue'
-    },
-    {
-      id: 2,
-      title: 'Mastering Tailwind CSS',
-      excerpt: 'Dive deep into utility-first CSS and learn how to build stunning, responsive designs efficiently.',
-      image: 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=600&h=400&fit=crop',
-      date: 'March 15, 2024',
-      category: 'CSS',
-      readTime: '10 min read',
-      color: 'purple'
-    },
-    {
-      id: 3,
-      title: 'Full-Stack Development with Node.js',
-      excerpt: 'Building scalable backend services with Node.js, Express, and MongoDB for production applications.',
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
-      date: 'March 10, 2024',
-      category: 'Backend',
-      readTime: '12 min read',
-      color: 'green'
-    },
-    {
-      id: 4,
-      title: 'Web Performance Optimization Tips',
-      excerpt: 'Essential techniques to make your web applications faster, more efficient, and better for users.',
-      image: 'https://images.unsplash.com/photo-1560264357-8d9766b48a58?w=600&h=400&fit=crop',
-      date: 'March 5, 2024',
-      category: 'Performance',
-      readTime: '9 min read',
-      color: 'orange'
-    },
-    {
-      id: 5,
-      title: 'Git Workflow Best Practices',
-      excerpt: 'Master version control with Git and establish a solid workflow for team collaboration.',
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
-      date: 'February 28, 2024',
-      category: 'Git',
-      readTime: '7 min read',
-      color: 'pink'
-    },
-    {
-      id: 6,
-      title: 'Responsive Design Fundamentals',
-      excerpt: 'Everything you need to know about creating seamless, accessible experiences across all devices.',
-      image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      date: 'February 20, 2024',
-      category: 'Design',
-      readTime: '8 min read',
-      color: 'indigo'
-    },
-  ]
+  const { id } = useParams()
+  const navigate = useNavigate()
+  
+  // Find the current article
+  const article = articles.find(a => a.id === parseInt(id))
+  
+  // Get related articles (exclude current)
+  const relatedArticles = articles.filter(a => a.id !== parseInt(id)).slice(0, 3)
+
+  if (!article) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-center space-y-4'>
+          <h1 className='text-4xl font-bold text-gray-900'>Article not found</h1>
+          <p className='text-gray-600'>The article you're looking for doesn't exist.</p>
+          <Button to='/articles' variant='primary' size='lg'>
+            Back to Articles
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const getCategoryStyles = (category) => {
     const styles = {
@@ -78,169 +40,148 @@ const ArticlePage = () => {
 
   return (
     <div className='space-y-24 pb-32'>
-      {/* HEADER */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8 pt-24 space-y-6'>
-        <div>
-
+      {/* HERO / HEADER */}
+      <section className='max-w-4xl mx-auto px-6 lg:px-8 pt-24 space-y-6'>
+        {/* Breadcrumb */}
+        <div className='flex items-center gap-2 text-sm text-gray-600'>
+          <Link to='/articles' className='hover:text-blue-600 transition-colors'>Articles</Link>
+          <span>/</span>
+          <span className='text-gray-900 font-medium'>{article.title}</span>
         </div>
-        <div>
-          <h1 className='text-5xl lg:text-6xl font-bold text-gray-900'>
-            Articles & Tutorials
+
+        {/* Article Title */}
+        <div className='space-y-4'>
+          <div className='flex items-center gap-2'>
+            <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${getCategoryStyles(article.category)}`}>
+              {article.category}
+            </span>
+          </div>
+          <h1 className='text-5xl lg:text-6xl font-bold text-gray-900 leading-tight'>
+            {article.title}
           </h1>
-          <p className='text-xl text-gray-600 mt-4 max-w-2xl'>
-            Sharing knowledge on web development, design, and best practices. Read my latest articles and tutorials.
-          </p>
         </div>
-      </section>
 
-      {/* FEATURED ARTICLE */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8'>
-        <div className='group grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-300 transition-all duration-300 p-8 lg:p-12'>
-          {/* Featured Image */}
-          <div className='relative w-full h-64 lg:h-80 overflow-hidden rounded-2xl bg-gray-100'>
-            <img 
-              src={articles[0].image}
-              alt={articles[0].title}
-              className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
-            />
-            <div className='absolute top-4 left-4'>
-              <span className={`text-xs font-bold px-4 py-2 rounded-full border ${getCategoryStyles(articles[0].category)}`}>
-                ⭐ FEATURED
-              </span>
-            </div>
+        {/* Article Meta */}
+        <div className='flex flex-wrap items-center gap-6 text-gray-600 border-t border-b border-gray-200 py-4'>
+          <div className='flex items-center gap-2'>
+            <span>📅</span>
+            <span>{article.date}</span>
           </div>
-
-          {/* Featured Content */}
-          <div className='space-y-5'>
-            <div>
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-full border inline-block ${getCategoryStyles(articles[0].category)}`}>
-                {articles[0].category}
-              </span>
-            </div>
-            <h2 className='text-3xl lg:text-4xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors'>
-              {articles[0].title}
-            </h2>
-            <p className='text-lg text-gray-600 leading-relaxed'>
-              {articles[0].excerpt}
-            </p>
-            <div className='flex items-center gap-4 text-sm text-gray-500 pt-2'>
-              <span>📅 {articles[0].date}</span>
-              <span>⏱️ {articles[0].readTime}</span>
-            </div>
-            <Button variant='glass-light' size='lg' className='mt-4'>
-              Read Full Article →
-            </Button>
+          <div className='flex items-center gap-2'>
+            <span>⏱️</span>
+            <span>{article.readTime}</span>
           </div>
-        </div>
-      </section>
-
-      {/* ARTICLES GRID */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8 space-y-12'>
-        <h2 className='text-3xl lg:text-4xl font-bold text-gray-900'>Latest Articles</h2>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {articles.slice(1).map((article) => (
-            <article
-              key={article.id}
-              className='group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col h-full'
-            >
-              {/* Article Image */}
-              <div className='relative w-full h-48 overflow-hidden bg-gray-100'>
-                <img 
-                  src={article.image}
-                  alt={article.title}
-                  className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
-                />
-                <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-              </div>
-
-              {/* Content */}
-              <div className='p-6 space-y-4 flex-1 flex flex-col'>
-                <div className='flex items-center justify-between'>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full border ${getCategoryStyles(article.category)}`}>
-                    {article.category}
-                  </span>
-                  <span className='text-xs text-gray-500 font-medium'>{article.readTime}</span>
-                </div>
-
-                <h3 className='text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2'>
-                  {article.title}
-                </h3>
-
-                <p className='text-gray-600 text-sm leading-relaxed flex-1 line-clamp-2'>
-                  {article.excerpt}
-                </p>
-
-                <div className='flex items-center justify-between pt-2 border-t border-gray-100'>
-                  <span className='text-xs text-gray-500'>{article.date}</span>
-                  <Button variant='glass-light' size='sm'>
-                    Read →
-                  </Button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* CATEGORIES SECTION */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8 space-y-10'>
-        <h2 className='text-3xl lg:text-4xl font-bold text-gray-900'>Browse by Category</h2>
-
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4'>
-          {['React', 'CSS', 'Backend', 'Performance', 'Git', 'Design'].map((cat, i) => (
-            <button 
-              key={i}
-              className={`py-3 px-4 rounded-xl font-semibold text-sm border transition-all duration-300 hover:shadow-lg hover:scale-105 ${getCategoryStyles(cat)}`}
-            >
-              {cat}
+          <div className='ml-auto flex items-center gap-2 text-sm'>
+            <span>Share:</span>
+            <button className='text-gray-600 hover:text-blue-600 transition-colors'>
+              <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 24 24'><path d='M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7' /></svg>
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED IMAGE */}
+      <section className='max-w-5xl mx-auto px-6 lg:px-8'>
+        <div className='relative w-full h-96 lg:h-[500px] overflow-hidden rounded-3xl bg-gray-100 shadow-2xl'>
+          <img 
+            src={article.image}
+            alt={article.title}
+            className='w-full h-full object-cover'
+          />
+        </div>
+      </section>
+
+      {/* ARTICLE CONTENT */}
+      <section className='max-w-3xl mx-auto px-6 lg:px-8'>
+        <div className='prose prose-lg max-w-none'>
+          {article.content && article.content.map((paragraph, idx) => (
+            <p key={idx} className='text-lg text-gray-700 leading-relaxed mb-8'>
+              {paragraph}
+            </p>
           ))}
         </div>
       </section>
 
-      {/* NEWSLETTER SECTION */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8 py-16'>
-        <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 lg:p-16 shadow-2xl'>
-          <div className='max-w-2xl mx-auto text-center space-y-6'>
-            <h2 className='text-3xl lg:text-4xl font-bold text-white'>
-              📬 Get New Articles in Your Inbox
-            </h2>
-            <p className='text-white/90 text-lg'>
-              Subscribe to my newsletter for weekly articles on web development, design tips, and coding best practices.
+      {/* ARTICLE EXCERPT IF NO CONTENT */}
+      {(!article.content || article.content.length === 0) && (
+        <section className='max-w-3xl mx-auto px-6 lg:px-8'>
+          <div className='bg-blue-50 border border-blue-200 rounded-2xl p-8 space-y-4'>
+            <h2 className='text-2xl font-bold text-blue-900'>Article Excerpt</h2>
+            <p className='text-lg text-blue-800 leading-relaxed'>
+              {article.excerpt}
             </p>
-            <div className='flex flex-col sm:flex-row gap-3 pt-4 max-w-md mx-auto'>
-              <input
-                type='email'
-                placeholder='your@email.com'
-                className='flex-1 px-6 py-3 rounded-lg bg-white border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 font-medium'
-              />
-              <Button variant='glass-white' size='lg'>
-                Subscribe
-              </Button>
+          </div>
+        </section>
+      )}
+
+      {/* AUTHOR BIO */}
+      <section className='max-w-3xl mx-auto px-6 lg:px-8'>
+        <div className='bg-gradient-to-r from-blue-50 to-purple-50 border border-gray-200 rounded-3xl p-8 flex gap-6'>
+          <div className='w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex-shrink-0'></div>
+          <div className='space-y-2'>
+            <h3 className='text-xl font-bold text-gray-900'>Jean Paula</h3>
+            <p className='text-gray-600'>
+              Full-stack developer passionate about building beautiful, functional web applications and sharing knowledge with the community.
+            </p>
+            <div className='flex gap-3 pt-2'>
+              <a href='#' className='text-blue-600 hover:text-blue-700 text-sm font-medium'>Twitter</a>
+              <a href='#' className='text-blue-600 hover:text-blue-700 text-sm font-medium'>GitHub</a>
+              <a href='#' className='text-blue-600 hover:text-blue-700 text-sm font-medium'>LinkedIn</a>
             </div>
-            <p className='text-white/75 text-sm'>
-              ✨ No spam, unsubscribe anytime
-            </p>
           </div>
         </div>
       </section>
+
+      {/* RELATED ARTICLES */}
+      {relatedArticles.length > 0 && (
+        <section className='max-w-5xl mx-auto px-6 lg:px-8 space-y-8'>
+          <h2 className='text-3xl lg:text-4xl font-bold text-gray-900'>Related Articles</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {relatedArticles.map((relArticle) => (
+              <Link
+                key={relArticle.id}
+                to={`/articles/${relArticle.id}`}
+                className='group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300'
+              >
+                <div className='relative w-full h-40 overflow-hidden bg-gray-100'>
+                  <img 
+                    src={relArticle.image}
+                    alt={relArticle.title}
+                    className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
+                  />
+                </div>
+                <div className='p-4 space-y-2'>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-full border inline-block ${getCategoryStyles(relArticle.category)}`}>
+                    {relArticle.category}
+                  </span>
+                  <h3 className='text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2'>
+                    {relArticle.title}
+                  </h3>
+                  <p className='text-xs text-gray-500'>
+                    {relArticle.readTime}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA SECTION */}
-      <section className='max-w-7xl mx-auto px-6 lg:px-8 py-12'>
-        <div className='bg-gray-50 border border-gray-200 rounded-3xl p-12 text-center space-y-6'>
-          <h2 className='text-3xl lg:text-4xl font-bold text-gray-900'>
-            Want to collaborate?
+      <section className='max-w-3xl mx-auto px-6 lg:px-8 py-12'>
+        <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center space-y-6'>
+          <h2 className='text-3xl lg:text-4xl font-bold text-white'>
+            Enjoyed this article?
           </h2>
-          <p className='text-gray-600 text-lg'>
-            Have an interesting idea or want to discuss web development? Let's connect!
+          <p className='text-white/90 text-lg'>
+            Share it with your network and subscribe for more articles like this.
           </p>
           <div className='flex flex-wrap justify-center gap-4 pt-4'>
-            <Button variant='glass-black' size='lg'>
-              💬 Get in Touch
+            <Button variant='glass-white' size='lg'>
+              � Subscribe
             </Button>
-            <Button variant='glass-light' size='lg'>
-              View My Projects
+            <Button to='/articles' variant='glass-light' size='lg'>
+              ← Back to Articles
             </Button>
           </div>
         </div>
