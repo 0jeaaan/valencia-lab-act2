@@ -92,10 +92,10 @@ const AboutPage = () => {
           </div>
 
           <div className='flex gap-4 pt-4'>
-            <Button variant='glass-blue' size='md'>
+            <Button variant='glass-light' size='md'>
               📥 Download CV
             </Button>
-            <Button variant='glass-purple' size='md'>
+            <Button variant='glass-dark' size='md'>
               💬 Get in Touch
             </Button>
           </div>

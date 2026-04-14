@@ -127,7 +127,7 @@ const ArticlePage = () => {
               <span>📅 {articles[0].date}</span>
               <span>⏱️ {articles[0].readTime}</span>
             </div>
-            <Button variant='glass-blue' size='lg' className='mt-4'>
+            <Button variant='glass-light' size='lg' className='mt-4'>
               Read Full Article →
             </Button>
           </div>
@@ -173,7 +173,7 @@ const ArticlePage = () => {
 
                 <div className='flex items-center justify-between pt-2 border-t border-gray-100'>
                   <span className='text-xs text-gray-500'>{article.date}</span>
-                  <Button variant='glass-green' size='sm'>
+                  <Button variant='glass-light' size='sm'>
                     Read →
                   </Button>
                 </div>
@@ -239,7 +239,7 @@ const ArticlePage = () => {
             <Button variant='glass-black' size='lg'>
               💬 Get in Touch
             </Button>
-            <Button variant='glass-pink' size='lg'>
+            <Button variant='glass-light' size='lg'>
               View My Projects
             </Button>
           </div>

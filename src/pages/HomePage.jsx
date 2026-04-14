@@ -59,7 +59,7 @@ const HomePage = () => {
             <Button variant='glass-black' size='lg' className='gap-2'>
               View Projects
             </Button>
-            <Button variant='glass-purple' size='lg'>
+            <Button variant='glass-light' size='lg'>
                Contact Me
             </Button>
           </div>
@@ -160,7 +160,7 @@ const HomePage = () => {
                 </div>
 
                 <div className='pt-2'>
-                  <Button variant='glass-green' size='md' className='self-start'>
+                  <Button variant='glass-light' size='md' className='self-start'>
                     View Project →
                   </Button>
                 </div>
@@ -171,7 +171,7 @@ const HomePage = () => {
 
         {/* View All Projects */}
         <div className='flex justify-center pt-8'>
-          <Button variant='glass-pink' size='lg'>
+          <Button variant='glass-light' size='lg'>
             View All Projects
           </Button>
         </div>

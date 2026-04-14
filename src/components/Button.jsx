@@ -21,15 +21,6 @@ const Button = ({
     
     'glass-dark': 'bg-black/20 border border-white/20 text-white hover:bg-black/30 hover:shadow-xl hover:shadow-black/30 active:scale-95 shadow-lg hover:scale-105',
     
-    // Color-specific glassmorphism with BLACK TEXT
-    'glass-white': 'bg-blue-400/25 border border-blue-400/40 text-gray-900 hover:bg-blue-400/35 hover:shadow-xl hover:shadow-blue-300/30 active:scale-95 shadow-lg hover:scale-105',
-    
-    'glass-white': 'bg-white-400/25 border border-purple-400/40 text-gray-900 hover:bg-white-400/35 hover:shadow-xl hover:shadow-purple-300/30 active:scale-95 shadow-lg hover:scale-105',
-    
-    'glass-white': 'bg-green-400/25 border border-green-400/40 text-gray-900 hover:bg-green-400/35 hover:shadow-xl hover:shadow-green-300/30 active:scale-95 shadow-lg hover:scale-105',
-    
-    'glass-white': 'bg-pink-400/25 border border-pink-400/40 text-gray-900 hover:bg-pink-400/35 hover:shadow-xl hover:shadow-pink-300/30 active:scale-95 shadow-lg hover:scale-105',
-    
     // Solid variants (backward compatibility)
     primary: 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:shadow-lg hover:shadow-blue-200 active:scale-95 shadow-md hover:scale-105',
     
