@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import DashLayout from "./layouts/DashLayout";
 import AuthLayout from "./layouts/AuthLayout";
 
@@ -16,6 +17,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import DashboardPage from "./pages/DashboardPages/DashboardPage";
 import ReportsPage from "./pages/DashboardPages/ReportsPage";
 import UsersPage from "./pages/DashboardPages/UsersPage";
+import DashArticleListPage from "./pages/DashboardPages/DashArticleListPage";
+
 
 const theme = createTheme({
   palette: {
@@ -58,12 +61,24 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={["admin", "editor"]}>
+        <DashLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <DashboardPage /> },
       { path: "reports", element: <ReportsPage /> },
-      { path: "users", element: <UsersPage /> },
+      { path: "articles", element: <DashArticleListPage /> },
+      {
+        path: "users",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <UsersPage />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {

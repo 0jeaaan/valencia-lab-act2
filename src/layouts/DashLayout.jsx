@@ -19,20 +19,27 @@ import {
   BarChart as ReportsIcon,
   People as UsersIcon,
   Logout as LogoutIcon,
+  Article as ArticleIcon,
 } from "@mui/icons-material";
 
 const DRAWER_WIDTH = 240;
-
-const drawerItems = [
-  { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-  { label: "Reports", icon: <ReportsIcon />, path: "/dashboard/reports" },
-  { label: "Users", icon: <UsersIcon />, path: "/dashboard/users" },
-];
 
 const DashLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
+
+  const drawerItems = [
+    { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+    { label: "Reports", icon: <ReportsIcon />, path: "/dashboard/reports" },
+    { label: "Articles", icon: <ArticleIcon />, path: "/dashboard/articles" },
+    ...(role === "admin"
+      ? [{ label: "Users", icon: <UsersIcon />, path: "/dashboard/users" }]
+      : []),
+  ];
 
   const handleDrawerToggle = () => {
     setMobileOpen((prev) => !prev);
@@ -43,14 +50,21 @@ const DashLayout = () => {
     setMobileOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/auth/signin");
+  };
+
   const drawer = (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Box sx={{ p: 2, borderBottom: "1px solid #e5e7eb" }}>
         <Typography variant="h6" fontWeight="bold">
           Valencia Dev
         </Typography>
+
         <Typography variant="body2" color="text.secondary">
-          Dashboard Panel
+          {user?.firstName ? `${user.firstName} • ${role}` : "Dashboard Panel"}
         </Typography>
       </Box>
 
@@ -66,7 +80,7 @@ const DashLayout = () => {
                 mb: 1,
                 borderRadius: 2,
                 color: isActive ? "primary.main" : "text.primary",
-                bgcolor: isActive ? "primary.50" : "transparent",
+                bgcolor: isActive ? "#EFF6FF" : "transparent",
                 "&:hover": {
                   bgcolor: "#EFF6FF",
                 },
@@ -80,6 +94,7 @@ const DashLayout = () => {
               >
                 {item.icon}
               </ListItemIcon>
+
               <ListItemText primary={item.label} />
             </ListItemButton>
           );
@@ -91,7 +106,7 @@ const DashLayout = () => {
           fullWidth
           variant="outlined"
           startIcon={<LogoutIcon />}
-          onClick={() => navigate("/")}
+          onClick={handleLogout}
         >
           Logout
         </Button>

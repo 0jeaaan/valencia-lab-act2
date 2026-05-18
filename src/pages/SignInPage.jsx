@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import { loginUser } from "../services/UserService";
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -12,9 +13,10 @@ const SignInPage = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
     setFormData((prev) => ({
       ...prev,
@@ -27,6 +29,8 @@ const SignInPage = () => {
         [name]: "",
       }));
     }
+
+    setServerError("");
   };
 
   const validateForm = () => {
@@ -43,32 +47,40 @@ const SignInPage = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     const newErrors = validateForm();
 
-    if (Object.keys(newErrors).length === 0) {
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const response = await loginUser(formData);
+
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
       setIsSubmitted(true);
 
       setTimeout(() => {
         navigate("/dashboard");
-      }, 1200);
-    } else {
-      setErrors(newErrors);
+      }, 1000);
+    } catch (error) {
+      setServerError(
+        error.response?.data?.message || "Invalid email or password"
+      );
     }
   };
 
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Welcome Back
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900">Welcome Back</h1>
 
-        <p className="text-gray-600 mt-2">
-          Sign in to continue
-        </p>
+        <p className="text-gray-600 mt-2">Sign in to continue</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
@@ -80,11 +92,15 @@ const SignInPage = () => {
           </div>
         )}
 
+        {serverError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-5">
+            <p className="text-red-700 font-medium">{serverError}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-semibold mb-2">Email</label>
 
             <input
               type="email"
@@ -96,16 +112,12 @@ const SignInPage = () => {
             />
 
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2">
-              Password
-            </label>
+            <label className="block text-sm font-semibold mb-2">Password</label>
 
             <input
               type="password"
@@ -117,18 +129,11 @@ const SignInPage = () => {
             />
 
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            className="w-full"
-          >
+          <Button type="submit" variant="primary" size="lg" className="w-full">
             Sign In
           </Button>
         </form>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -14,9 +14,14 @@ import {
   FormControlLabel,
   Switch,
   Chip,
+  Alert,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import usersSeed from "../../assets/users.json";
+import {
+  getUsers,
+  registerUser,
+  updateUser,
+} from "../../services/UserService";
 
 const roles = ["admin", "editor", "viewer"];
 const genders = ["male", "female", "other"];
@@ -36,32 +41,46 @@ const initialFormData = {
 };
 
 const UsersPage = () => {
-  const [users, setUsers] = useState(
-    usersSeed.map((user, index) => ({
-      id: index + 1,
-      ...user,
-    }))
-  );
-
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const data = await getUsers();
+
+      const formattedUsers = data.map((user) => ({
+        id: user._id,
+        ...user,
+      }));
+
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.log(error);
+      setServerError("Unable to fetch users from database.");
+    }
+  };
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const searchValue = search.toLowerCase();
 
       const matchesSearch =
-        user.firstName.toLowerCase().includes(searchValue) ||
-        user.lastName.toLowerCase().includes(searchValue) ||
-        user.email.toLowerCase().includes(searchValue) ||
-        user.username.toLowerCase().includes(searchValue);
+        user.firstName?.toLowerCase().includes(searchValue) ||
+        user.lastName?.toLowerCase().includes(searchValue) ||
+        user.email?.toLowerCase().includes(searchValue) ||
+        user.username?.toLowerCase().includes(searchValue);
 
       const matchesRole = roleFilter ? user.role === roleFilter : true;
       const matchesGender = genderFilter ? user.gender === genderFilter : true;
@@ -81,6 +100,7 @@ const UsersPage = () => {
     setFormData(initialFormData);
     setErrors({});
     setEditingId(null);
+    setServerError("");
   };
 
   const handleOpenAdd = () => {
@@ -98,26 +118,34 @@ const UsersPage = () => {
     setFormData({
       firstName: row.firstName || "",
       lastName: row.lastName || "",
-      age: row.age || "",
+      age: row.age?.toString() || "",
       gender: row.gender || "",
       contactNumber: row.contactNumber || "",
       email: row.email || "",
       role: row.role || "viewer",
       username: row.username || "",
-      password: row.password || "",
+      password: "",
       address: row.address || "",
       isActive: Boolean(row.isActive),
     });
     setErrors({});
+    setServerError("");
     setOpen(true);
   };
 
-  const handleToggleStatus = (id) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id ? { ...user, isActive: !user.isActive } : user
-      )
-    );
+  const handleToggleStatus = async (id) => {
+    try {
+      const selectedUser = users.find((user) => user.id === id);
+
+      await updateUser(id, {
+        isActive: !selectedUser.isActive,
+      });
+
+      await fetchUsers();
+    } catch (error) {
+      console.log(error);
+      setServerError("Unable to update user status.");
+    }
   };
 
   const validateForm = () => {
@@ -131,7 +159,7 @@ const UsersPage = () => {
       newErrors.lastName = "Last name is required";
     }
 
-    if (!formData.age.trim()) {
+    if (!formData.age.toString().trim()) {
       newErrors.age = "Age is required";
     } else if (!/^[0-9]+$/.test(formData.age)) {
       newErrors.age = "Age must be a number only";
@@ -157,10 +185,14 @@ const UsersPage = () => {
       newErrors.username = "Username must not contain spaces";
     }
 
-    if (!formData.password.trim()) {
+    if (!editingId && !formData.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
+    } else if (formData.password && formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
     }
 
     return newErrors;
@@ -180,9 +212,11 @@ const UsersPage = () => {
         [name]: "",
       }));
     }
+
+    setServerError("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const validationErrors = validateForm();
 
     if (Object.keys(validationErrors).length > 0) {
@@ -190,36 +224,42 @@ const UsersPage = () => {
       return;
     }
 
-    if (editingId) {
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === editingId ? { ...user, ...formData } : user
-        )
+    try {
+      if (editingId) {
+        const updateData = { ...formData };
+
+        if (!updateData.password) {
+          delete updateData.password;
+        }
+
+        await updateUser(editingId, updateData);
+      } else {
+        await registerUser(formData);
+      }
+
+      await fetchUsers();
+      setOpen(false);
+      resetForm();
+    } catch (error) {
+      setServerError(
+        error.response?.data?.message || "Unable to save user."
       );
-    } else {
-      const newUser = {
-        id: users.length + 1,
-        ...formData,
-      };
-
-      setUsers((prev) => [...prev, newUser]);
     }
-
-    setOpen(false);
-    resetForm();
   };
 
   const columns = [
     {
       field: "id",
       headerName: "ID",
-      width: 70,
+      width: 100,
+      renderCell: (params) => params.row.id.slice(-5),
     },
     {
       field: "fullName",
       headerName: "Full Name",
       width: 200,
-      valueGetter: (value, row) => `${row.firstName} ${row.lastName}`,
+      valueGetter: (value, row) =>
+        `${row.firstName || ""} ${row.lastName || ""}`,
     },
     {
       field: "username",
@@ -311,13 +351,19 @@ const UsersPage = () => {
         </Button>
       </Stack>
 
+      {serverError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {serverError}
+        </Alert>
+      )}
+
       <Paper sx={{ p: 2, mb: 3, borderRadius: 3, boxShadow: 3 }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <TextField
             fullWidth
             label="Search by name, email, or username"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
           />
 
           <TextField
@@ -325,7 +371,7 @@ const UsersPage = () => {
             fullWidth
             label="Role"
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
+            onChange={(event) => setRoleFilter(event.target.value)}
           >
             <MenuItem value="">All Roles</MenuItem>
             {roles.map((role) => (
@@ -340,7 +386,7 @@ const UsersPage = () => {
             fullWidth
             label="Gender"
             value={genderFilter}
-            onChange={(e) => setGenderFilter(e.target.value)}
+            onChange={(event) => setGenderFilter(event.target.value)}
           >
             <MenuItem value="">All Genders</MenuItem>
             {genders.map((gender) => (
@@ -355,7 +401,7 @@ const UsersPage = () => {
             fullWidth
             label="Status"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(event) => setStatusFilter(event.target.value)}
           >
             <MenuItem value="">All Status</MenuItem>
             <MenuItem value="active">Active</MenuItem>
@@ -385,6 +431,8 @@ const UsersPage = () => {
 
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
+            {serverError && <Alert severity="error">{serverError}</Alert>}
+
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <TextField
                 fullWidth
@@ -489,7 +537,12 @@ const UsersPage = () => {
               value={formData.password}
               onChange={handleChange}
               error={Boolean(errors.password)}
-              helperText={errors.password}
+              helperText={
+                editingId
+                  ? errors.password ||
+                    "Leave blank if you do not want to change password"
+                  : errors.password
+              }
             />
 
             <TextField
@@ -500,6 +553,8 @@ const UsersPage = () => {
               rows={2}
               value={formData.address}
               onChange={handleChange}
+              error={Boolean(errors.address)}
+              helperText={errors.address}
             />
 
             <FormControlLabel
