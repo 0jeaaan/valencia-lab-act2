@@ -1,94 +1,372 @@
-import { Box, Typography, Paper } from "@mui/material";
+import { useMemo, useState } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  TextField,
+  MenuItem,
+  Stack,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControlLabel,
+  Switch,
+  Chip,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import usersSeed from "../../assets/users.json";
 
-const rows = [
-  {
-    id: 1,
-    firstName: "Jean",
-    lastName: "Valencia",
-    age: 21,
-    email: "jean@example.com",
-  },
-  {
-    id: 2,
-    firstName: "Maria",
-    lastName: "Santos",
-    age: 22,
-    email: "maria@example.com",
-  },
-  {
-    id: 3,
-    firstName: "John",
-    lastName: "Dela Cruz",
-    age: 23,
-    email: "john@example.com",
-  },
-  {
-    id: 4,
-    firstName: "Angela",
-    lastName: "Reyes",
-    age: 20,
-    email: "angela@example.com",
-  },
-  {
-    id: 5,
-    firstName: "Mark",
-    lastName: "Garcia",
-    age: 24,
-    email: "mark@example.com",
-  },
-];
+const roles = ["admin", "editor", "viewer"];
+const genders = ["male", "female", "other"];
 
-const columns = [
-  {
-    field: "id",
-    headerName: "ID",
-    width: 80,
-  },
-  {
-    field: "firstName",
-    headerName: "First Name",
-    width: 160,
-  },
-  {
-    field: "lastName",
-    headerName: "Last Name",
-    width: 160,
-  },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 100,
-  },
-  {
-    field: "email",
-    headerName: "Email",
-    width: 230,
-  },
-  {
-    field: "fullName",
-    headerName: "Full Name",
-    width: 220,
-    sortable: false,
-    valueGetter: (value, row) => `${row.firstName} ${row.lastName}`,
-  },
-];
+const initialFormData = {
+  firstName: "",
+  lastName: "",
+  age: "",
+  gender: "",
+  contactNumber: "",
+  email: "",
+  role: "viewer",
+  username: "",
+  password: "",
+  address: "",
+  isActive: true,
+};
 
 const UsersPage = () => {
+  const [users, setUsers] = useState(
+    usersSeed.map((user, index) => ({
+      id: index + 1,
+      ...user,
+    }))
+  );
+
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [genderFilter, setGenderFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
+  const [errors, setErrors] = useState({});
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const searchValue = search.toLowerCase();
+
+      const matchesSearch =
+        user.firstName.toLowerCase().includes(searchValue) ||
+        user.lastName.toLowerCase().includes(searchValue) ||
+        user.email.toLowerCase().includes(searchValue) ||
+        user.username.toLowerCase().includes(searchValue);
+
+      const matchesRole = roleFilter ? user.role === roleFilter : true;
+      const matchesGender = genderFilter ? user.gender === genderFilter : true;
+
+      const matchesStatus =
+        statusFilter === ""
+          ? true
+          : statusFilter === "active"
+          ? user.isActive
+          : !user.isActive;
+
+      return matchesSearch && matchesRole && matchesGender && matchesStatus;
+    });
+  }, [users, search, roleFilter, genderFilter, statusFilter]);
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setErrors({});
+    setEditingId(null);
+  };
+
+  const handleOpenAdd = () => {
+    resetForm();
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    resetForm();
+  };
+
+  const handleEdit = (row) => {
+    setEditingId(row.id);
+    setFormData({
+      firstName: row.firstName || "",
+      lastName: row.lastName || "",
+      age: row.age || "",
+      gender: row.gender || "",
+      contactNumber: row.contactNumber || "",
+      email: row.email || "",
+      role: row.role || "viewer",
+      username: row.username || "",
+      password: row.password || "",
+      address: row.address || "",
+      isActive: Boolean(row.isActive),
+    });
+    setErrors({});
+    setOpen(true);
+  };
+
+  const handleToggleStatus = (id) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === id ? { ...user, isActive: !user.isActive } : user
+      )
+    );
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+    }
+
+    if (!formData.age.trim()) {
+      newErrors.age = "Age is required";
+    } else if (!/^[0-9]+$/.test(formData.age)) {
+      newErrors.age = "Age must be a number only";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Gender is required";
+    }
+
+    if (!formData.contactNumber.trim()) {
+      newErrors.contactNumber = "Contact number is required";
+    } else if (!/^[0-9]{11}$/.test(formData.contactNumber)) {
+      newErrors.contactNumber = "Contact number must be 11 digits";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (/\s/.test(formData.username)) {
+      newErrors.username = "Username must not contain spaces";
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+
+    return newErrors;
+  };
+
+  const handleChange = (event) => {
+    const { name, value, checked, type } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const handleSubmit = () => {
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    if (editingId) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === editingId ? { ...user, ...formData } : user
+        )
+      );
+    } else {
+      const newUser = {
+        id: users.length + 1,
+        ...formData,
+      };
+
+      setUsers((prev) => [...prev, newUser]);
+    }
+
+    setOpen(false);
+    resetForm();
+  };
+
+  const columns = [
+    {
+      field: "id",
+      headerName: "ID",
+      width: 70,
+    },
+    {
+      field: "fullName",
+      headerName: "Full Name",
+      width: 200,
+      valueGetter: (value, row) => `${row.firstName} ${row.lastName}`,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 170,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 230,
+    },
+    {
+      field: "age",
+      headerName: "Age",
+      width: 90,
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      width: 120,
+    },
+    {
+      field: "role",
+      headerName: "Role",
+      width: 130,
+    },
+    {
+      field: "isActive",
+      headerName: "Status",
+      width: 130,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? "Active" : "Inactive"}
+          color={params.value ? "success" : "default"}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 220,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleEdit(params.row)}
+          >
+            Edit
+          </Button>
+
+          <Button
+            variant="contained"
+            size="small"
+            color={params.row.isActive ? "error" : "success"}
+            onClick={() => handleToggleStatus(params.row.id)}
+          >
+            {params.row.isActive ? "Disable" : "Activate"}
+          </Button>
+        </Stack>
+      ),
+    },
+  ];
+
   return (
     <Box>
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-        Users
-      </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={2}
+        sx={{ mb: 3 }}
+      >
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+            Users
+          </Typography>
 
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        User list table using MUI Data Grid.
-      </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Search, filter, add, edit, activate, and disable users.
+          </Typography>
+        </Box>
 
-      <Paper sx={{ height: 430, width: "100%", borderRadius: 3, boxShadow: 3 }}>
+        <Button variant="contained" onClick={handleOpenAdd}>
+          Add User
+        </Button>
+      </Stack>
+
+      <Paper sx={{ p: 2, mb: 3, borderRadius: 3, boxShadow: 3 }}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+          <TextField
+            fullWidth
+            label="Search by name, email, or username"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <TextField
+            select
+            fullWidth
+            label="Role"
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+          >
+            <MenuItem value="">All Roles</MenuItem>
+            {roles.map((role) => (
+              <MenuItem key={role} value={role}>
+                {role}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            fullWidth
+            label="Gender"
+            value={genderFilter}
+            onChange={(e) => setGenderFilter(e.target.value)}
+          >
+            <MenuItem value="">All Genders</MenuItem>
+            {genders.map((gender) => (
+              <MenuItem key={gender} value={gender}>
+                {gender}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            fullWidth
+            label="Status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </TextField>
+        </Stack>
+      </Paper>
+
+      <Paper sx={{ height: 470, width: "100%", borderRadius: 3, boxShadow: 3 }}>
         <DataGrid
-          rows={rows}
+          rows={filteredUsers}
           columns={columns}
           initialState={{
             pagination: {
@@ -101,6 +379,151 @@ const UsersPage = () => {
           disableRowSelectionOnClick
         />
       </Paper>
+
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+        <DialogTitle>{editingId ? "Edit User" : "Add User"}</DialogTitle>
+
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField
+                fullWidth
+                label="First Name"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                error={Boolean(errors.firstName)}
+                helperText={errors.firstName}
+              />
+
+              <TextField
+                fullWidth
+                label="Last Name"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                error={Boolean(errors.lastName)}
+                helperText={errors.lastName}
+              />
+            </Stack>
+
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField
+                fullWidth
+                label="Age"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                error={Boolean(errors.age)}
+                helperText={errors.age}
+              />
+
+              <TextField
+                select
+                fullWidth
+                label="Gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                error={Boolean(errors.gender)}
+                helperText={errors.gender}
+              >
+                {genders.map((gender) => (
+                  <MenuItem key={gender} value={gender}>
+                    {gender}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Stack>
+
+            <TextField
+              fullWidth
+              label="Contact Number"
+              name="contactNumber"
+              value={formData.contactNumber}
+              onChange={handleChange}
+              error={Boolean(errors.contactNumber)}
+              helperText={errors.contactNumber}
+            />
+
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              error={Boolean(errors.email)}
+              helperText={errors.email}
+            />
+
+            <TextField
+              select
+              fullWidth
+              label="Role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              {roles.map((role) => (
+                <MenuItem key={role} value={role}>
+                  {role}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              fullWidth
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              error={Boolean(errors.username)}
+              helperText={errors.username}
+            />
+
+            <TextField
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              error={Boolean(errors.password)}
+              helperText={errors.password}
+            />
+
+            <TextField
+              fullWidth
+              label="Address"
+              name="address"
+              multiline
+              rows={2}
+              value={formData.address}
+              onChange={handleChange}
+            />
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.isActive}
+                  onChange={handleChange}
+                  name="isActive"
+                />
+              }
+              label={`Active Status: ${
+                formData.isActive ? "Active" : "Inactive"
+              }`}
+            />
+          </Stack>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button variant="contained" onClick={handleSubmit}>
+            {editingId ? "Update User" : "Save User"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

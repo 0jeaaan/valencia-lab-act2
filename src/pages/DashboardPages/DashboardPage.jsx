@@ -1,10 +1,4 @@
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, Card, CardContent, Typography } from "@mui/material";
 import {
   People,
   Assessment,
@@ -47,13 +41,13 @@ const DashboardPage = () => {
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Summary of the system data and user activity.
+        Summary of users, reports, growth, and active accounts.
       </Typography>
 
       <Grid container spacing={3}>
-        {stats.map((item, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+        {stats.map((item) => (
+          <Grid item xs={12} sm={6} md={3} key={item.title}>
+            <Card sx={{ borderRadius: 3, boxShadow: 3, height: "100%" }}>
               <CardContent>
                 <Box
                   sx={{
@@ -87,12 +81,13 @@ const DashboardPage = () => {
       <Card sx={{ mt: 4, borderRadius: 3, boxShadow: 3 }}>
         <CardContent>
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
-            Welcome to the Dashboard
+            Lab Activity 6 Dashboard
           </Typography>
 
           <Typography color="text.secondary">
-            This page shows an overview or summary of the system. It is part of
-            the Lab Activity 5 requirement using Material UI components.
+            This dashboard serves as the overview page for Lab Activity 6. The
+            Reports page includes printable reports, while the Users page
+            includes search, filter, and form validation features.
           </Typography>
         </CardContent>
       </Card>
