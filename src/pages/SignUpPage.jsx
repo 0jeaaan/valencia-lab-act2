@@ -107,9 +107,11 @@ const SignUpPage = () => {
         navigate("/auth/signin");
       }, 1200);
     } catch (error) {
-      setServerError(
-        error.response?.data?.message || "Something went wrong. Please try again."
-      );
+      if (!error.response) {
+        setServerError("Cannot connect to server. Please ensure the API server is running at the configured URL.");
+      } else {
+        setServerError(error.response?.data?.message || "Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -148,7 +150,7 @@ const SignUpPage = () => {
               <input
                 type="text"
                 name="firstName"
-                placeholder="Jean"
+                placeholder="First Name"
                 value={formData.firstName}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -169,7 +171,7 @@ const SignUpPage = () => {
               <input
                 type="text"
                 name="lastName"
-                placeholder="Valencia"
+                placeholder="Last Name"
                 value={formData.lastName}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -190,7 +192,7 @@ const SignUpPage = () => {
               <input
                 type="text"
                 name="age"
-                placeholder="21"
+                placeholder="Age"
                 value={formData.age}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -261,7 +263,7 @@ const SignUpPage = () => {
             <input
               type="text"
               name="username"
-              placeholder="jeanvalencia"
+              placeholder="Username"
               value={formData.username}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -313,7 +315,7 @@ const SignUpPage = () => {
 
             <textarea
               name="address"
-              placeholder="Cavite, Philippines"
+              placeholder="Address"
               value={formData.address}
               onChange={handleChange}
               rows="3"

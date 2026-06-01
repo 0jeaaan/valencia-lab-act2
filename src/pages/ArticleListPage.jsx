@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import ArticleList from '../components/ArticleList'
-import { articles } from '../assets/article-content'
+import { useArticles } from '../hooks/useArticles'
 
 const ArticleListPage = () => {
   const navigate = useNavigate()
+  const { articles } = useArticles()
 
   const handleArticleClick = (articleId) => {
     navigate(`/articles/${articleId}`)

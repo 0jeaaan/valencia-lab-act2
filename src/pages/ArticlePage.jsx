@@ -1,16 +1,18 @@
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import Button from '../components/Button'
-import { articles } from '../assets/article-content'
+import { useArticles } from '../hooks/useArticles'
 
 const ArticlePage = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { name } = useParams()
+  const { articles } = useArticles()
   
-  // Find the current article
-  const article = articles.find(a => a.id === parseInt(id))
+  // Find the current article by name or id
+  const article = articles.find(a => 
+    a.name === name || a.id === parseInt(name)
+  )
   
   // Get related articles (exclude current)
-  const relatedArticles = articles.filter(a => a.id !== parseInt(id)).slice(0, 3)
+  const relatedArticles = articles.filter(a => a.id !== article?.id).slice(0, 3)
 
   if (!article) {
     return (

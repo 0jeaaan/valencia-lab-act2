@@ -7,17 +7,22 @@ import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
-connectDB();
-
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 8000;
+
+connectDB();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

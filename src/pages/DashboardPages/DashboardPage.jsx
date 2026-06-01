@@ -1,39 +1,42 @@
-import { Box, Grid, Card, CardContent, Typography } from "@mui/material";
-import {
-  People,
-  Assessment,
-  TrendingUp,
-  CheckCircle,
-} from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { Box, Grid, Card, CardContent, Typography, Button } from "@mui/material";
+import { People, Assessment, TrendingUp, CheckCircle } from "@mui/icons-material";
+import { getUsers } from "../../services/UserService";
 
-const stats = [
-  {
-    title: "Total Users",
-    value: "120",
-    icon: <People />,
-    color: "#2563EB",
-  },
-  {
-    title: "Total Reports",
-    value: "45",
-    icon: <Assessment />,
-    color: "#9333EA",
-  },
-  {
-    title: "Growth Rate",
-    value: "78%",
-    icon: <TrendingUp />,
-    color: "#F59E0B",
-  },
-  {
-    title: "Active Users",
-    value: "89",
-    icon: <CheckCircle />,
-    color: "#10B981",
-  },
+const statsDefault = [
+  { title: "Total Users", value: "120", icon: <People />, color: "#2563EB" },
+  { title: "Total Reports", value: "45", icon: <Assessment />, color: "#9333EA" },
+  { title: "Growth Rate", value: "78%", icon: <TrendingUp />, color: "#F59E0B" },
+  { title: "Active Users", value: "89", icon: <CheckCircle />, color: "#10B981" },
 ];
 
 const DashboardPage = () => {
+  const [stats, setStats] = useState(statsDefault);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const users = await getUsers();
+        const total = users.length;
+        const active = users.filter((u) => u.isActive).length;
+        setStats((prev) => [
+          { ...prev[0], value: total },
+          prev[1],
+          prev[2],
+          { ...prev[3], value: active },
+        ]);
+      } catch {
+        // keep defaults if API unavailable
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -42,6 +45,11 @@ const DashboardPage = () => {
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Summary of users, reports, growth, and active accounts.
+        {loading && (
+          <span style={{ marginLeft: 12, color: "#6b7280", fontSize: 12 }}>
+            Refreshing stats...
+          </span>
+        )}
       </Typography>
 
       <Grid container spacing={3}>

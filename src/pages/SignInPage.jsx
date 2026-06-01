@@ -69,9 +69,12 @@ const SignInPage = () => {
         navigate("/dashboard");
       }, 1000);
     } catch (error) {
-      setServerError(
-        error.response?.data?.message || "Invalid email or password"
-      );
+      // If no response, likely connection refused (server not running / wrong URL)
+      if (!error.response) {
+        setServerError("Cannot connect to server. Please ensure the API server is running at the configured URL.");
+      } else {
+        setServerError(error.response?.data?.message || "Invalid email or password");
+      }
     }
   };
 
@@ -154,4 +157,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignInPage;  

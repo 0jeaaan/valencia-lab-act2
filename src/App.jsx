@@ -5,6 +5,7 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashLayout from "./layouts/DashLayout";
 import AuthLayout from "./layouts/AuthLayout";
+import { ArticlesProvider } from "./context/ArticlesProvider";
 
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
         ),
       },
     ],
-  },
+  },  
   {
     path: "*",
     element: <NotFoundPage />,
@@ -89,10 +90,12 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <ArticlesProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </ArticlesProvider>
   );
 }
 

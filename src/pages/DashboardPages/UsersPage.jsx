@@ -42,6 +42,7 @@ const initialFormData = {
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
@@ -57,6 +58,8 @@ const UsersPage = () => {
   }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
+    setServerError("");
     try {
       const data = await getUsers();
 
@@ -67,8 +70,18 @@ const UsersPage = () => {
 
       setUsers(formattedUsers);
     } catch (error) {
-      console.log(error);
-      setServerError("Unable to fetch users from database.");
+      console.error("fetchUsers error:", error);
+      if (!error.response) {
+        setServerError(
+          "Cannot connect to server. Please ensure the API server is running."
+        );
+      } else if (error.response.status === 403 || error.response.status === 401) {
+        setServerError(error.response.data?.message || "Unauthorized to fetch users.");
+      } else {
+        setServerError(error.response?.data?.message || "Unable to fetch users from database.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -353,7 +366,11 @@ const UsersPage = () => {
 
       {serverError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {serverError}
+          {serverError} {serverError && (
+            <Button size="small" onClick={fetchUsers} sx={{ ml: 2 }}>
+              Retry
+            </Button>
+          )}
         </Alert>
       )}
 
@@ -414,6 +431,7 @@ const UsersPage = () => {
         <DataGrid
           rows={filteredUsers}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {
@@ -583,4 +601,4 @@ const UsersPage = () => {
   );
 };
 
-export default UsersPage;
+export default UsersPage;   
