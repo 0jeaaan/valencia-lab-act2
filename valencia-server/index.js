@@ -11,6 +11,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://valencia-lab-act2.vercel.app",
   "https://jeanpaula-portfolio.vercel.app",
 ];
@@ -22,11 +23,10 @@ app.use(
 
       const isAllowed =
         allowedOrigins.includes(origin) ||
-        /^https:\/\/jeanpaula-portfolio-[a-z0-9-]+\.vercel\.app$/.test(origin);
+        /^https:\/\/jeanpaula-portfolio-[a-z0-9-]+\.vercel\.app$/.test(origin) ||
+        /^https:\/\/valencia-lab-act2-[a-z0-9-]+\.vercel\.app$/.test(origin);
 
-      if (isAllowed) {
-        return callback(null, true);
-      }
+      if (isAllowed) return callback(null, true);
 
       return callback(new Error(`Not allowed by CORS: ${origin}`));
     },
@@ -38,12 +38,24 @@ app.use(
 
 app.use(express.json());
 
-// API Routes
+app.get("/", (req, res) => {
+  res.json({
+    message: "Valencia WebProg API is running.",
+    routes: ["/api", "/api/users", "/api/users/login", "/api/users/register"],
+  });
+});
+
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Valencia WebProg API is running.",
+    routes: ["/api/users", "/api/users/login", "/api/users/register"],
+  });
+});
+
 app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 8000;
 
-// Connect database
 connectDB();
 
 app.listen(PORT, () => {
